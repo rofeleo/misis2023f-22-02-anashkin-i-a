@@ -1,3 +1,8 @@
 build/*
 .vscode/*
 images/*
+prj.codeforces/main
+prj.codeforces/main.cpp
+prj.codeforces/in
+prj.codeforces/out
+prj.codeforces/ans
