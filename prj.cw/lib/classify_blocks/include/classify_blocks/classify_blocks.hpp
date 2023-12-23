@@ -3,6 +3,7 @@
 #endif
 
 #include "rectangles/rectangles.hpp"
+
 #include <vector>
 
 enum class Labels {
@@ -27,5 +28,7 @@ class ClassifyRectangles {
     const CutRectangles* rectangles_ptr;
     std::vector<std::vector<Labels>> rectangles_types;
     int NumberOfBlackPixels(const cv::Mat& img_area);
-    int WhiteToBlackTransitions(const cv::Mat& img_area);
+    int HorizWhiteToBlackTransitions(const cv::Mat& img_area);
+    int VertWhiteToBlackTransitions(const cv::Mat& img_area);
+    int ColsWithBlackPixels(const cv::Mat& img_area);
 };  

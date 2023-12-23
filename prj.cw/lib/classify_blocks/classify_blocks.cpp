@@ -25,11 +25,31 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
 
       // start extracting features
 
-      int N = NumberOfBlackPixels(grayImage(rectangles[i_page][i_rect]));
+      cv::Mat cur_rect = grayImage(rectangles[i_page][i_rect]);
 
-      // std::cout << N << ", ";
+      int N = NumberOfBlackPixels(cur_rect);
 
+      int TH = HorizWhiteToBlackTransitions(cur_rect);
 
+      int TV = VertWhiteToBlackTransitions(cur_rect);
+
+      int delta_x = ColsWithBlackPixels(cur_rect);
+
+      int height = rectangles[i_page][i_rect].height;
+
+      int width = rectangles[i_page][i_rect].width;
+
+      // count other features (based on previous)
+
+      double R = static_cast<double>(width) / height;
+
+      double D = N / static_cast<double>(width * height);
+
+      double TH_X = static_cast<double>(TH) / delta_x;
+
+      double TV_X = static_cast<double>(TV) / delta_x;
+
+      double TH_Y = static_cast<double>(TH) / height;
 
     }
   } 
@@ -44,12 +64,39 @@ int ClassifyRectangles::NumberOfBlackPixels(const cv::Mat& img_area) {
   return img_area.rows * img_area.cols - cv::countNonZero(img_area);
 };
 
-int ClassifyRectangles::WhiteToBlackTransitions(const cv::Mat& img_area) {
-  int ans = 0;
+int ClassifyRectangles::HorizWhiteToBlackTransitions(const cv::Mat& img_area) {
+  int n_transitions = 0;
   for (int i_row = 0; i_row < img_area.rows; i_row += 1) {
     const uchar* p = img_area.ptr<uchar>(i_row);
-    for (int i_col = 0; i_col < img_area.cols; i_col += 1) {
-      
+    for (int i_col = 1; i_col < img_area.cols; i_col += 1) {
+      if (p[i_col] == 0 && p[i_col - 1] == 255) { // 0 - black 255 - white
+        n_transitions += 1;
+      }
     }
   }
+  return n_transitions;
+};
+
+int ClassifyRectangles::VertWhiteToBlackTransitions(const cv::Mat& img_area) {
+  int n_transitions = 0;
+  for (int i_row = 0; i_row < img_area.rows - 1; i_row += 1) {
+    const uchar* p = img_area.ptr<uchar>(i_row);
+    const uchar* n = img_area.ptr<uchar>(i_row + 1);
+    for (int i_col = 0; i_col < img_area.cols; i_col += 1) {
+      if (p[i_col] == 255 && n[i_col] == 0) { // 0 - black 255 - white
+        n_transitions += 1;
+      }
+    }
+  }
+  return n_transitions;
+};
+
+int ClassifyRectangles::ColsWithBlackPixels(const cv::Mat& img_area) {
+  int cnt_cols = 0;
+  for (int i_col = 0; i_col < img_area.cols; i_col += 1) {
+    if (cv::countNonZero(img_area.col(i_col))) {
+      cnt_cols += 1;
+    }
+  }
+  return cnt_cols;
 };
