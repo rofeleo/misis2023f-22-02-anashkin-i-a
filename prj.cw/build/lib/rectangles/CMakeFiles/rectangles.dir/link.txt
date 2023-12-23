@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc librectangles.a CMakeFiles/rectangles.dir/rectangles.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib librectangles.a

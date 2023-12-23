@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libclassify_blocks.a CMakeFiles/classify_blocks.dir/classify_blocks.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libclassify_blocks.a

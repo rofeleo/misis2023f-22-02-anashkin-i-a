@@ -6,3 +6,7 @@ prj.codeforces/main.cpp
 prj.codeforces/in
 prj.codeforces/out
 prj.codeforces/ans
+prj.cw/build/*
+prj.cw/data/*
+prj.cw/.DS_Store
+.DS_Store
