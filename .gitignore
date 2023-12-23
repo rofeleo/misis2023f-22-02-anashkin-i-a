@@ -9,4 +9,5 @@ prj.codeforces/ans
 prj.cw/build/*
 prj.cw/data/*
 prj.cw/.DS_Store
+prj.cw/.vscode/*
 .DS_Store

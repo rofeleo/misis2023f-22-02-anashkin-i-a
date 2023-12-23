@@ -2,7 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <filesystem>
 #include <rectangles/rectangles.hpp>
-
+#include <classify_blocks/classify_blocks.hpp>
 #include <queue>
 #include <vector>
 
@@ -16,18 +16,15 @@ int main() {
     std::vector<cv::Mat> srcImages;
     cv::Mat scan = cv::imread("/Users/ilya/misis2023f-22-02-anashkin-i-a/prj.cw/data/img1.png", cv::IMREAD_COLOR);
     srcImages.push_back(scan);
+    uchar* p = scan.ptr<uchar>(0);
+    cv::Mat grayScan;
 
+    cv::cvtColor(scan, grayScan, cv::COLOR_BGR2GRAY);
     long long su = 0;
     int cnt = 0;
-    CutRectangles rectangles(srcImages);
+    CutRectangles cutted_rectangles(srcImages);
 
-    for(int p = 0; p < rectangles.ssize(); ++p){
-        cv::Mat tempImage;
-        tempImage = srcImages[p];
-        for(auto& i: rectangles[p]){
-            cv::rectangle(tempImage, i, cv::Scalar(0, 255, 0));
-        }
-        cv::imshow("debug", tempImage);
-        cv::waitKey(0);
-    }
+    ClassifyRectangles clf_rect(srcImages, cutted_rectangles);
+
+
 }
