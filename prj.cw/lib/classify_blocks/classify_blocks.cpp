@@ -49,6 +49,11 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
     MeanBlocksHeight = static_cast<double>(heights[heights.size() / 2 - 1] + heights[heights.size() / 2]) / 2;
   }
 
+  for (auto i : heights) std::cout << i << " ";
+  std::cout << std::endl;
+
+  std::cout << MeanBlocksHeight << std::endl;
+
   for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
     
     cv::Mat gray_image;
@@ -167,7 +172,7 @@ int ClassifyRectangles::VertWhiteToBlackTransitions(const cv::Mat& img_area) {
 int ClassifyRectangles::ColsWithBlackPixels(const cv::Mat& img_area) {
   int cnt_cols = 0;
   for (int i_col = 0; i_col < img_area.cols; i_col += 1) {
-    if (cv::countNonZero(img_area.col(i_col))) {
+    if (img_area.rows != cv::countNonZero(img_area.col(i_col))) {
       cnt_cols += 1;
     }
   }
