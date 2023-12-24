@@ -62,11 +62,6 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
     MeanBlocksHeight = static_cast<double>(heights[heights.size() / 2 - 1] + heights[heights.size() / 2]) / 2;
   }
 
-  // for (auto i : heights) std::cout << i << " ";
-  // std::cout << std::endl;
-
-  // std::cout << MeanBlocksHeight << std::endl;
-
   for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
     
     cv::Mat gray_image;
@@ -189,10 +184,12 @@ int ClassifyRectangles::ColsWithBlackPixels(const cv::Mat& img_area) {
 };
 
 void ClassifyRectangles::PrintPageWithClassifiedRect(ptrdiff_t i_page) {
+  cv::Mat copy;
+  pages_[i_page].copyTo(copy);
   for (int i_rect = 0; i_rect < (*rectangles_ptr)[i_page].size(); i_rect += 1) {
     Labels cur_label = rectangles_types[i_page][i_rect];
-    cv::rectangle(pages_[i_page], (*rectangles_ptr)[i_page][i_rect], color_for_label[static_cast<int>(cur_label)], 2);
+    cv::rectangle(copy, (*rectangles_ptr)[i_page][i_rect], color_for_label[static_cast<int>(cur_label)], 2);
   }
-  cv::imshow("result_of_classification", pages_[i_page]);
+  cv::imshow("result_of_classification", copy);
   cv::waitKey(0);
 };
