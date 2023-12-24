@@ -7,6 +7,12 @@ std::ostream& operator<<(std::ostream& ostrm, const Labels& lbl) {
     case Labels::text:
       ostrm << "text";
       break;
+    case Labels::large_text:
+      ostrm << "large_text";
+      break;
+    case Labels::small_text:
+      ostrm << "small_text";
+      break;
     case Labels::horizontal_line:
       ostrm << "horizontal_line";
       break;
@@ -26,17 +32,22 @@ std::ostream& operator<<(std::ostream& ostrm, const Labels& lbl) {
 
 ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const CutRectangles& rectangles)
   : rectangles_ptr(&rectangles) {
-
+  std::vector<int> heights;
   rectangles_types.resize(rectangles.ssize());
   for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
     for (int i_rect = 0; i_rect < rectangles[i_page].size(); i_rect += 1) {
-      MeanBlocksHeight += static_cast<double>(rectangles[i_page][i_rect].height);
-      n_rectangles += 1;
+      heights.push_back(rectangles[i_page][i_rect].height);
     }
     rectangles_types[i_page].resize(rectangles[i_page].size());
   }
 
-  MeanBlocksHeight /= n_rectangles;
+  std::sort(heights.begin(), heights.end());
+
+  if (heights.size() % 2) {
+    MeanBlocksHeight = heights[heights.size() / 2];
+  } else {
+    MeanBlocksHeight = static_cast<double>(heights[heights.size() / 2 - 1] + heights[heights.size() / 2]) / 2;
+  }
 
   for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
     
@@ -100,11 +111,10 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
         rectangles_types[i_page][i_rect] = Labels::text;
       } else if (TH_X < ch3 && R > cr && c3 < TV_X && TV_X < c4) {
         rectangles_types[i_page][i_rect] = Labels::horizontal_line;
-      } else if (TH_X > 1 / static_cast<double>(ch3) && R < 1 / static_cast<double>(cr) && 
-                  c3 < TH_Y && TH_Y < c4) {
+      } else if (TH_X > 1 / ch3 && R < 1 / cr && c3 < TH_Y && TH_Y < c4) {
         rectangles_types[i_page][i_rect] = Labels::vertical_line;
       } else if (height > c2 * MeanBlocksHeight && ch1 < TH_X && TH_X < ch2 && cv1 < TV_X && TV_X < cv2) {
-        rectangles_types[i_page][i_rect] = Labels::text;
+        rectangles_types[i_page][i_rect] = Labels::large_text;
       } else if (D < c5) {
         rectangles_types[i_page][i_rect] = Labels::graphic;
       } else {

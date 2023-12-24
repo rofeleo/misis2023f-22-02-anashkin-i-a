@@ -5,9 +5,12 @@
 #include "rectangles/rectangles.hpp"
 
 #include <vector>
+#include <algorithm>
 
 enum class Labels {
   text,
+  large_text, // titles, headings
+  small_text, // footnotes, remarks 
   horizontal_line,
   vertical_line,
   graphic,
@@ -22,7 +25,6 @@ class ClassifyRectangles {
   
   private:
     double MeanBlocksHeight = 0;
-    int n_rectangles = 0;
     double c1 = 0.8;//
     double c2 = 1.2; //
     double c3 = 0.95;//
@@ -34,7 +36,6 @@ class ClassifyRectangles {
     double cv1 = 1.2;//
     double cv2 = 2.6;//
     double cr = 5;//
-
 
   private:
     const CutRectangles* rectangles_ptr;
