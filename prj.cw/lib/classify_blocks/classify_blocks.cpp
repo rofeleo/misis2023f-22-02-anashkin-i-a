@@ -40,15 +40,19 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
 
   for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
     
-    cv::Mat grayImage;
+    cv::Mat gray_image;
 
-    cv::cvtColor(images[i_page], grayImage, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(images[i_page], gray_image, cv::COLOR_BGR2GRAY);
+
+    cv::Mat black_and_white;
+
+    cv::threshold(gray_image, black_and_white, 128, 255, cv::THRESH_BINARY);
 
     for (int i_rect = 0; i_rect < rectangles[i_page].size(); i_rect += 1) {
 
       // start extracting features
 
-      cv::Mat cur_rect = grayImage(rectangles[i_page][i_rect]);
+      cv::Mat cur_rect = black_and_white(rectangles[i_page][i_rect]);
 
       int N = NumberOfBlackPixels(cur_rect);
 
@@ -90,7 +94,7 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
         std::cout << "D: " << D << std::endl;
       #endif
 
-      if (c1 * MeanBlocksHeight < height && height > c2 * MeanBlocksHeight) {
+      if (c1 * MeanBlocksHeight < height && height < c2 * MeanBlocksHeight) {
         rectangles_types[i_page][i_rect] = Labels::text;
       } else if (height < c1 * MeanBlocksHeight && ch1 < TH_X && TH_X < ch2) {
         rectangles_types[i_page][i_rect] = Labels::text;
