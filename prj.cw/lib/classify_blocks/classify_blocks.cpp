@@ -1,5 +1,28 @@
+#define DEBUG
+
 #include "classify_blocks/classify_blocks.hpp"
 
+std::ostream& operator<<(std::ostream& ostrm, const Labels& lbl) {
+  switch (lbl) {
+    case Labels::text:
+      ostrm << "text";
+      break;
+    case Labels::horizontal_line:
+      ostrm << "horizontal_line";
+      break;
+    case Labels::vertical_line:
+      ostrm << "vertical_line";
+      break;
+    case Labels::graphic:
+      ostrm << "graphic";
+      break;
+    case::Labels::picture:
+      ostrm << "picture";
+    default:
+      break;
+  }
+  return ostrm;
+}
 
 ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const CutRectangles& rectangles)
   : rectangles_ptr(&rectangles) {
@@ -51,9 +74,45 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
 
       double TH_Y = static_cast<double>(TH) / height;
 
+      #ifdef DEBUG
+        std::cout << "page number: " << i_page << " " << "rectangle number: " << i_rect << std::endl;
+        std::cout << "x_min: " << rectangles[i_page][i_rect].x << std::endl;
+        std::cout << "width: " << width << std::endl;
+        std::cout << "y_min: " << rectangles[i_page][i_rect].y << std::endl;
+        std::cout << "height: " << height << std::endl;
+        std::cout << "delta_x: " << delta_x << std::endl;
+        std::cout << "delta_x / dx: " << static_cast<double>(delta_x) / width << std::endl;
+        std::cout << "TH: " << TH << std::endl;
+        std::cout << "TV: " << TV << std::endl;
+        std::cout << "TH_X: " << TH_X << std::endl;
+        std::cout << "TV_X: " << TV_X << std::endl;
+        std::cout << "N: " << N << std::endl;
+        std::cout << "D: " << D << std::endl;
+      #endif
+
+      if (c1 * MeanBlocksHeight < height && height > c2 * MeanBlocksHeight) {
+        rectangles_types[i_page][i_rect] = Labels::text;
+      } else if (height < c1 * MeanBlocksHeight && ch1 < TH_X && TH_X < ch2) {
+        rectangles_types[i_page][i_rect] = Labels::text;
+      } else if (TH_X < ch3 && R > cr && c3 < TV_X && TV_X < c4) {
+        rectangles_types[i_page][i_rect] = Labels::horizontal_line;
+      } else if (TH_X > 1 / static_cast<double>(ch3) && R < 1 / static_cast<double>(cr) && 
+                  c3 < TH_Y && TH_Y < c4) {
+        rectangles_types[i_page][i_rect] = Labels::vertical_line;
+      } else if (height > c2 * MeanBlocksHeight && ch1 < TH_X && TH_X < ch2 && cv1 < TV_X && TV_X < cv2) {
+        rectangles_types[i_page][i_rect] = Labels::text;
+      } else if (D < c5) {
+        rectangles_types[i_page][i_rect] = Labels::graphic;
+      } else {
+        rectangles_types[i_page][i_rect] = Labels::picture;
+      }
+
+      #ifdef DEBUG
+        std::cout << rectangles_types[i_page][i_rect] << std::endl;
+        std::cout << "===============================================================================" << std::endl;
+      #endif
     }
   } 
-
 };
 
 const std::vector<Labels>& ClassifyRectangles::operator[](ptrdiff_t ind) const {
