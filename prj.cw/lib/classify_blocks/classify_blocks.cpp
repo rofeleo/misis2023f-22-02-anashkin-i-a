@@ -37,7 +37,7 @@ std::string ClassifyRectangles::LabelToStr(Label lbl) {
     default:
       break;
   }
-}
+};
 
 ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const CutRectangles& rectangles)
   : rectangles_ptr(&rectangles),
@@ -60,6 +60,9 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
   } else {
     MeanBlocksHeight = static_cast<double>(heights[heights.size() / 2 - 1] + heights[heights.size() / 2]) / 2;
   }
+
+  // for (int i : heights) std::cout << i << " ";
+  // std::cout << std::endl;
 
   cv::Mat gray_image;
 
@@ -189,8 +192,14 @@ void ClassifyRectangles::PrintPageWithClassifiedRect(ptrdiff_t i_page) const {
   cv::Mat copy;
   pages[i_page].copyTo(copy);
   for (int i_rect = 0; i_rect < (*rectangles_ptr)[i_page].size(); i_rect += 1) {
+    
     Label cur_label = rectangles_types[i_page][i_rect];
-    cv::rectangle(copy, (*rectangles_ptr)[i_page][i_rect], color_for_label[static_cast<int>(cur_label)], 3);
+    cv::Rect cur_rect = (*rectangles_ptr)[i_page][i_rect];
+
+    cv::rectangle(copy,cur_rect, color_for_label[static_cast<int>(cur_label)], 3);
+    cv::putText(copy, LabelToStr(cur_label), cv::Point(cur_rect.x - 100, cur_rect.y), 
+    cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 2);
+
   }
   cv::imshow("result_of_classification", copy);
   cv::waitKey(0);
@@ -203,18 +212,3 @@ Label ClassifyRectangles::at(int i_page, int i_rect) const {
   return rectangles_types[i_page][i_rect];
 };
 
-void ClassifyRectangles::PrintPageWithClfRectText(ptrdiff_t i_page) const {
-   if (i_page < 0 || i_page >= pages.size()) {
-    throw(std::out_of_range("page with whis index doesn't exist"));
-  }
-  cv::Mat copy;
-  pages[i_page].copyTo(copy);
-  for (int i_rect = 0; i_rect < (*rectangles_ptr)[i_page].size(); i_rect += 1) {
-    Label cur_label = rectangles_types[i_page][i_rect];
-    cv::Rect cur_rect = (*rectangles_ptr)[i_page][i_rect];
-    cv::putText(copy, LabelToStr(cur_label), cv::Point(cur_rect.x - 100, cur_rect.y), 
-    cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 2);
-  }
-  cv::imshow("result_of_classification", copy);
-  cv::waitKey(0);
-};

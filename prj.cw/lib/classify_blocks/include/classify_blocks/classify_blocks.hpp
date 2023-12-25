@@ -59,7 +59,6 @@ class ClassifyRectangles {
   public:
     void PrintPageWithClassifiedRect(ptrdiff_t i_page) const;
     Label at(int i_page, int i_rect) const;
-    void PrintPageWithClfRectText(ptrdiff_t) const;
 
   private:
     const double c1 = 0.8;
