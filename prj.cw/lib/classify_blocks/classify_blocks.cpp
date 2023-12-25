@@ -2,34 +2,6 @@
 
 #include "classify_blocks/classify_blocks.hpp"
 
-std::ostream& operator<<(std::ostream& ostrm, const Labels& lbl) {
-  switch (lbl) {
-    case Labels::text:
-      ostrm << "text";
-      break;
-    case Labels::large_text:
-      ostrm << "large_text";
-      break;
-    case Labels::small_text:
-      ostrm << "small_text";
-      break;
-    case Labels::horizontal_line:
-      ostrm << "horizontal_line";
-      break;
-    case Labels::vertical_line:
-      ostrm << "vertical_line";
-      break;
-    case Labels::graphic:
-      ostrm << "graphic";
-      break;
-    case::Labels::picture:
-      ostrm << "picture";
-    default:
-      break;
-  }
-  return ostrm;
-}
-
 std::vector<cv::Scalar> ClassifyRectangles::color_for_label{
   {0, 0, 255}, 
   {0, 128, 255},
@@ -42,7 +14,7 @@ std::vector<cv::Scalar> ClassifyRectangles::color_for_label{
 
 ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const CutRectangles& rectangles)
   : rectangles_ptr(&rectangles),
-    pages_(images) {
+    pages(images) {
   std::vector<int> heights;
   rectangles_types.resize(rectangles.ssize());
   for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
@@ -119,19 +91,19 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
       #endif
 
       if (c1 * MeanBlocksHeight < height && height < c2 * MeanBlocksHeight) {
-        rectangles_types[i_page][i_rect] = Labels::text;
+        rectangles_types[i_page][i_rect] = Label::text;
       } else if (height < c1 * MeanBlocksHeight && ch1 < TH_X && TH_X < ch2) {
-        rectangles_types[i_page][i_rect] = Labels::small_text;
+        rectangles_types[i_page][i_rect] = Label::small_text;
       } else if (TH_X < ch3 && R > cr && c3 < TV_X && TV_X < c4) {
-        rectangles_types[i_page][i_rect] = Labels::horizontal_line;
+        rectangles_types[i_page][i_rect] = Label::horizontal_line;
       } else if (TH_X > 1 / ch3 && R < 1 / cr && c3 < TH_Y && TH_Y < c4) {
-        rectangles_types[i_page][i_rect] = Labels::vertical_line;
+        rectangles_types[i_page][i_rect] = Label::vertical_line;
       } else if (height > c2 * MeanBlocksHeight && ch1 < TH_X && TH_X < ch2 && cv1 < TV_X && TV_X < cv2) {
-        rectangles_types[i_page][i_rect] = Labels::large_text;
+        rectangles_types[i_page][i_rect] = Label::large_text;
       } else if (D < c5) {
-        rectangles_types[i_page][i_rect] = Labels::graphic;
+        rectangles_types[i_page][i_rect] = Label::graphic;
       } else {
-        rectangles_types[i_page][i_rect] = Labels::picture;
+        rectangles_types[i_page][i_rect] = Label::picture;
       }
 
       #ifdef DEBUG
@@ -183,13 +155,23 @@ int ClassifyRectangles::ColsWithBlackPixels(const cv::Mat& img_area) {
   return cnt_cols;
 };
 
-void ClassifyRectangles::PrintPageWithClassifiedRect(ptrdiff_t i_page) {
+void ClassifyRectangles::PrintPageWithClassifiedRect(ptrdiff_t i_page) const {
+  if (i_page < 0 || i_page >= pages.size()) {
+    throw(std::out_of_range("page with whis index doesn't exist"));
+  }
   cv::Mat copy;
-  pages_[i_page].copyTo(copy);
+  pages[i_page].copyTo(copy);
   for (int i_rect = 0; i_rect < (*rectangles_ptr)[i_page].size(); i_rect += 1) {
-    Labels cur_label = rectangles_types[i_page][i_rect];
-    cv::rectangle(copy, (*rectangles_ptr)[i_page][i_rect], color_for_label[static_cast<int>(cur_label)], 2);
+    Label cur_label = rectangles_types[i_page][i_rect];
+    cv::rectangle(copy, (*rectangles_ptr)[i_page][i_rect], color_for_label[static_cast<int>(cur_label)], 3);
   }
   cv::imshow("result_of_classification", copy);
   cv::waitKey(0);
 };
+
+Label ClassifyRectangles::at(int i_page, int i_rect) const {
+  if (i_page >= rectangles_types.size() || i_page < 0 || i_rect > rectangles_types[i_page].size() || i_rect < 0) {
+    throw(std::out_of_range("wrong i_page or i_rect"));
+  }
+  return rectangles_types[i_page][i_rect];
+}
