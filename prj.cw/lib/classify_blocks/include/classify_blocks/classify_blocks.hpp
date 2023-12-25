@@ -44,6 +44,8 @@ inline std::ostream& operator<<(std::ostream& ostrm, const Label& lbl) {
   }
   return ostrm;
 }
+
+
 class ClassifyRectangles {
   
   public:
@@ -57,6 +59,7 @@ class ClassifyRectangles {
   public:
     void PrintPageWithClassifiedRect(ptrdiff_t i_page) const;
     Label at(int i_page, int i_rect) const;
+    void PrintPageWithClfRectText(ptrdiff_t) const;
 
   private:
     const double c1 = 0.8;
@@ -82,4 +85,5 @@ class ClassifyRectangles {
 
   private:
     static std::vector<cv::Scalar> color_for_label;
+    static std::string LabelToStr(Label lbl);
 };  
