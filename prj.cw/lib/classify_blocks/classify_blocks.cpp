@@ -16,8 +16,8 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
   : rectangles_ptr(&rectangles),
     pages(images) {
   std::vector<int> heights;
-  rectangles_types.resize(rectangles.ssize());
-  for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
+  rectangles_types.resize(images.size());
+  for (int i_page = 0; i_page < images.size(); i_page += 1) {
     for (int i_rect = 0; i_rect < rectangles[i_page].size(); i_rect += 1) {
       heights.push_back(rectangles[i_page][i_rect].height);
     }
@@ -34,13 +34,13 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
     MeanBlocksHeight = static_cast<double>(heights[heights.size() / 2 - 1] + heights[heights.size() / 2]) / 2;
   }
 
-  for (int i_page = 0; i_page < rectangles.ssize(); i_page += 1) {
-    
-    cv::Mat gray_image;
+  cv::Mat gray_image;
+
+  cv::Mat black_and_white;
+
+  for (int i_page = 0; i_page < images.size(); i_page += 1) {
 
     cv::cvtColor(images[i_page], gray_image, cv::COLOR_BGR2GRAY);
-
-    cv::Mat black_and_white;
 
     cv::threshold(gray_image, black_and_white, 128, 255, cv::THRESH_BINARY);
 

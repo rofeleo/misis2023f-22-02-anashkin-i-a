@@ -4,8 +4,8 @@
 
 #include "rectangles/rectangles.hpp"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 enum class Label {
   text,
