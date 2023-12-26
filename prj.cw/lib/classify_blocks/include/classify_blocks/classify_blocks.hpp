@@ -61,7 +61,7 @@ class ClassifyRectangles {
     Label at(int i_page, int i_rect) const;
 
   private:
-    const double c1 = 0.8;
+    const double c1 = 0.7;
     const double c2 = 1.2;
     const double c3 = 0.95;
     const double c4 = 1.05;

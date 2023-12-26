@@ -1,4 +1,4 @@
-// #define DEBUG
+#define DEBUG
 
 #include "classify_blocks/classify_blocks.hpp"
 
@@ -61,8 +61,10 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
     MeanBlocksHeight = static_cast<double>(heights[heights.size() / 2 - 1] + heights[heights.size() / 2]) / 2;
   }
 
-  // for (int i : heights) std::cout << i << " ";
-  // std::cout << std::endl;
+  #ifdef DEBUG
+    std::cout << "MeanBlocksHeight: " << MeanBlocksHeight << std::endl;
+    std::cout << "Usual text size is between: " << MeanBlocksHeight * c1 << " and " << MeanBlocksHeight * c2 << std::endl; 
+  #endif
 
   cv::Mat gray_image;
 
@@ -187,14 +189,19 @@ int ClassifyRectangles::ColsWithBlackPixels(const cv::Mat& img_area) {
 
 void ClassifyRectangles::PrintPageWithClassifiedRect(ptrdiff_t i_page) const {
   if (i_page < 0 || i_page >= pages.size()) {
-    throw(std::out_of_range("page with whis index doesn't exist"));
+    throw(std::out_of_range("Page with this index doesn't exist"));
   }
   cv::Mat copy;
   pages[i_page].copyTo(copy);
   for (int i_rect = 0; i_rect < (*rectangles_ptr)[i_page].size(); i_rect += 1) {
-    
+
     Label cur_label = rectangles_types[i_page][i_rect];
     cv::Rect cur_rect = (*rectangles_ptr)[i_page][i_rect];
+
+    #ifdef DEBUG
+      cv::putText(copy, "(" + std::to_string(i_page) + ", " + std::to_string(i_rect) + ")", 
+        cv::Point(cur_rect.x - 120, cur_rect.y + 30), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 1);
+    #endif
 
     cv::rectangle(copy,cur_rect, color_for_label[static_cast<int>(cur_label)], 3);
     cv::putText(copy, LabelToStr(cur_label), cv::Point(cur_rect.x - 100, cur_rect.y), 
@@ -207,7 +214,7 @@ void ClassifyRectangles::PrintPageWithClassifiedRect(ptrdiff_t i_page) const {
 
 Label ClassifyRectangles::at(int i_page, int i_rect) const {
   if (i_page >= rectangles_types.size() || i_page < 0 || i_rect > rectangles_types[i_page].size() || i_rect < 0) {
-    throw(std::out_of_range("wrong i_page or i_rect"));
+    throw(std::out_of_range("Wrong i_page or i_rect"));
   }
   return rectangles_types[i_page][i_rect];
 };
