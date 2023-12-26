@@ -11,7 +11,7 @@ find_package(OpenCV REQUIRED)
 
 # SET(CMAKE_VERBOSE_MAKEFILE True)
 
-add_executable(test_app "test.cpp")
+add_executable(test_app "example.cpp")
 
 add_subdirectory("lib")
 

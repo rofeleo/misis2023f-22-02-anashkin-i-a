@@ -1,4 +1,4 @@
-#define DEBUG
+// #define DEBUG
 
 #include "classify_blocks/classify_blocks.hpp"
 
@@ -144,6 +144,12 @@ ClassifyRectangles::ClassifyRectangles(const std::vector<cv::Mat>& images, const
       #endif
     }
   } 
+};
+
+ClassifyRectangles::~ClassifyRectangles() {
+  for (cv::Mat& page : pages) {
+    ~page;
+  }
 };
 
 int ClassifyRectangles::NumberOfBlackPixels(const cv::Mat& img_area) {

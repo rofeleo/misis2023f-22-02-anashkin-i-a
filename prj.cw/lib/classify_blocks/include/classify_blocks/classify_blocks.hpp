@@ -50,11 +50,10 @@ class ClassifyRectangles {
   
   public:
     ClassifyRectangles(const std::vector<cv::Mat>& images, const CutRectangles& rectangles);
-    ~ClassifyRectangles() = default;
-    // ClassifyRectangles(const ClassifyRectangles& other) = default;
-    // ClassifyRectangles(ClassifyRectangles&& other) = default;
-    // ClassifyRectangles& operator=(ClassifyRectangles&& other) = default;
-    // ClassifyRectangles& operator=(const ClassifyRectangles& other) = default;
+    ~ClassifyRectangles();
+    ClassifyRectangles(const ClassifyRectangles& other) = delete;
+    ClassifyRectangles& operator=(const ClassifyRectangles& other) = delete;
+    ClassifyRectangles(ClassifyRectangles&& other) = default;
 
   public:
     void PrintPageWithClassifiedRect(ptrdiff_t i_page) const;
@@ -74,7 +73,7 @@ class ClassifyRectangles {
     const double cr = 5;
 
   private:
-    const CutRectangles* rectangles_ptr;
+    const CutRectangles* rectangles_ptr = nullptr;
     std::vector<std::vector<Label>> rectangles_types;
     int NumberOfBlackPixels(const cv::Mat& img_area);
     int HorizWhiteToBlackTransitions(const cv::Mat& img_area);
