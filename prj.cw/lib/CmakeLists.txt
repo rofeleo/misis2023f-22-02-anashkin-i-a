@@ -1,2 +1,3 @@
 add_subdirectory(classify_blocks)
 add_subdirectory(rectangles)
+add_subdirectory(pdf2img)

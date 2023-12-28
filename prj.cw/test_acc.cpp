@@ -6,10 +6,18 @@
 #include <iostream>
 #include <vector>
 
-#include "classify_blocks/classify_blocks.hpp"
 #include "nlohmann/json.hpp"
 
+#include "classify_blocks/classify_blocks.hpp"
+#include "pdf2img/pdf2img.h"
+
 int main(int argv, char* argc[]) {
+
+  poppler::document* mypdf = poppler::document::load_from_file(argc[2]);
+
+  const int DPI = 300;
+
+  pdf2img images_from_pdf(mypdf, DPI);
 
   std::ifstream json_file_strm(argc[1]);
 
@@ -21,67 +29,54 @@ int main(int argv, char* argc[]) {
 
   // return 0;
 
-  std::vector<std::vector<Label>> y;
-
   std::vector<cv::Mat> images;
 
-  int i_page_js = 0;
-
-  for (const auto& block : json_data) {
-
-    // std::cout << (argc[2] + std::string("/") + block["filename"].get<std::string>()) << std::endl;
-    images.push_back(cv::imread(argc[2] + std::string("/") + block["filename"].get<std::string>()));
-
-    for (const auto& region : block["regions"]) {
-      y[i_page_js].push_back(static_cast<Label>(std::stoi(region["region_attributes"]["type"].get<std::string>())));
-      // std::cout << y.back() << std::endl;
-    }
-    i_page_js += 1;
-    // return 0;
+  for (int i_page = 0; i_page < images_from_pdf.get_size(); i_page += 1) {
+    images.push_back(images_from_pdf[i_page]);
   }
-  
-  // for (auto i : y) std::cout << i << std::endl;
-  // for (auto i : images) {
-  //     cv::imshow("dsad", i);
-  //     cv::waitKey(0);
-  // }
 
   CutRectangles rect(images);
 
   ClassifyRectangles clf(images, rect);
-  for (int i_page = 0; i_page < images.size(); i_page += 1) {
-    clf.PrintPageWithClassifiedRect(i_page);
-    for (auto& i : y[i_page]) {
-      std::cout << i << std::endl;
-    }
-  }
-
 
   int cnt_false = 0;
   int cnt_true = 0;
 
-  // for (int i_page = 0; i_page < images.size(); i_page += 1) {
-  //   for (int i_rect = 0; i_rect < rect[i_page].size(); i_rect += 1) {
-  //     if (clf.at(i_page, i_rect) != y[i_page * i_rect]) cnt_false += 1;
-  //     else cnt_true += 1;
-  //   }
-  // }
+  for (const auto& block : json_data) {
+    
+    int i_page = std::stoi(block["file_attributes"]["page_number"].get<std::string>());
 
-  std::cout << cnt_false << " " << cnt_true;
+    int i_rect = 0;
 
-  // for (const auto& i : json_data["img3.jpg580109"]["regions"]) {
-  //   static_cast<Label>(std::stoi(i["region_attributes"]["type"].get<std::string>())) << std::endl;
-  // }
+    for (const auto& region : block["regions"]) {
 
-  // std::string my_path = argc[1];
+      if (i_page > images.size()) {
+        std::cout << "page wrong: " << i_page;
+        return 0;
+      } 
 
-  // int cnt_pages = 0;
+      if (i_rect > rect[i_page].size()) {
+        std::cout << "rect wrong: " << i_page << " " << i_rect;
+        cv::imshow("wrong page", images[i_page]);
+        cv::waitKey(0);
+        return 0;
+      }
 
-  // for(auto& file: std::filesystem::directory_iterator(my_path)){
-  //       if(file.path().string().find(".jpg") != std::string::npos){
-  //           std::cout << file.path() << std::endl;
-  //       }
-  //   }
+      Label y = static_cast<Label>(std::stoi(region["region_attributes"]["type"].get<std::string>()));
+
+      if (y != clf.at(i_page, i_rect)) {
+        cnt_false += 1;
+      } else {
+        cnt_true += 1;
+      }
+
+      i_rect += 1;
+      
+    } 
+
+  }
+  
+  std::cout << 100 - (static_cast<double>(cnt_false) / cnt_true) * 100;
 
   return 0;
 }

@@ -9,6 +9,10 @@ find_package(OpenCV REQUIRED)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 
+find_package(PkgConfig)
+
+pkg_check_modules(POPPLER_CPP REQUIRED IMPORTED_TARGET poppler-cpp)
+
 # SET(CMAKE_VERBOSE_MAKEFILE True)
 
 add_executable(test_app "example.cpp")
@@ -17,6 +21,7 @@ add_executable(accuracy_test "test_acc.cpp")
 
 add_subdirectory("lib")
 
-target_link_libraries(test_app PRIVATE classify_blocks)
+target_link_libraries(test_app PRIVATE pdf2img classify_blocks)
 
-target_link_libraries(accuracy_test PRIVATE classify_blocks nlohmann_json::nlohmann_json)
+target_link_libraries(accuracy_test PRIVATE pdf2img classify_blocks nlohmann_json::nlohmann_json)
+
