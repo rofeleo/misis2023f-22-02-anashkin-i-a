@@ -12,26 +12,17 @@
   @{
 */
 
-/*!
-  \brief Содержит возможные метки для содержимого зоны.
-
-  text - обычный  текст документа. \n
-  small_text - текст меньшего размера, чем обычный (м. б. сноски, пометки). \n
-  large_text - текст большего размера, чем обычный (м. б. заголовки). \n
-  horizontal_line - горизонтальная линия. \n
-  vertical_line - вертикальная линия. \n
-  graphic - м.б. графики, схемы, таблицы. \n
-  picture - изображения (отличается от graphic плотностью пикселей).
-*/
+/// Содержит возможные метки для содержимого блока.
 enum class Label {
-  text,
-  large_text, // titles, headings
-  small_text, // footnotes, remarks 
-  horizontal_line,
-  vertical_line,
-  graphic,
-  picture
+  text, ///< обычный  текст документа.
+  large_text, ///< текст меньшего размера, чем обычный (м. б. сноски, пометки).
+  small_text, ///< текст большего размера, чем обычный (м. б. заголовки).
+  horizontal_line, ///< горизонтальная линия.
+  vertical_line, ///< вертикальная линия.
+  graphic, ///< м.б. графики, схемы, таблицы.
+  picture ///< изображения (отличается от graphic плотностью пикселей).
 };
+
 
 inline std::ostream& operator<<(std::ostream& ostrm, const Label& lbl) {
   switch (lbl) {
@@ -61,25 +52,42 @@ inline std::ostream& operator<<(std::ostream& ostrm, const Label& lbl) {
   return ostrm;
 }
 
-
+/*!
+   \brief основной и единственный класс.
+*/
 class ClassifyRectangles {
   
   public:
+    /*!
+    * \param images вектор с исходными исзображениями.
+    * \param rectangles содержит координаты зон с содержимым, которое будем классифицировать.
+    */
     ClassifyRectangles(const std::vector<cv::Mat>& images, const CutRectangles& rectangles);
     ~ClassifyRectangles();
     ClassifyRectangles(const ClassifyRectangles& other) = delete;
     ClassifyRectangles& operator=(const ClassifyRectangles& other) = delete;
     ClassifyRectangles(ClassifyRectangles&& other) = default;
+    /*!
+      \brief метод для вывода страницу с метками типа контента.
 
-  public:
+      \param i_page номер страницы.
+    */
     void PrintPageWithClassifiedRect(ptrdiff_t i_page) const;
+    /*!
+      \brief метод для получения типа содержимого, ограниченного конкретным прямоугольником.
+
+      \param i_page номер страницы.
+      \param i_rect номер прямоугольника на странице (нулевой прямоугольник - самый верхний).
+    
+      \return тип контента.
+    */
     Label at(int i_page, int i_rect) const;
 
   private:
-    const double c1 = 0.7;
-    const double c2 = 1.2;
-    const double c3 = 0.95;
-    const double c4 = 1.05;
+    const double c1 = 0.7; 
+    const double c2 = 1.2; 
+    const double c3 = 0.95; 
+    const double c4 = 1.05; 
     const double c5 = 0.2;
     const double ch1 = 1.2;
     const double ch2 = 3;
@@ -91,9 +99,21 @@ class ClassifyRectangles {
   private:
     const CutRectangles* rectangles_ptr = nullptr;
     std::vector<std::vector<Label>> rectangles_types;
+    /*!
+      \brief метод для нахождения количества черных пикселей в области.
+    */
     int NumberOfBlackPixels(const cv::Mat& img_area);
+    /*!
+      \brief метод для нахождения количества таких черных пикселей, что перед каждым стоит белый пиксель.
+    */
     int HorizWhiteToBlackTransitions(const cv::Mat& img_area);
+    /*!
+      \brief метод для нахождения количества таких черных пикселей, что сверху над каждым стоит белый пиксель.
+    */
     int VertWhiteToBlackTransitions(const cv::Mat& img_area);
+    /*!
+      \brief метод для нахождения количества столбцов, содержащих хотя бы один черный пиксель.
+    */
     int ColsWithBlackPixels(const cv::Mat& img_area);
     std::vector<cv::Mat> pages;
 

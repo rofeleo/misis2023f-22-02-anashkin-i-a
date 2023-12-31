@@ -10,4 +10,7 @@ prj.cw/build/*
 prj.cw/data/*
 prj.cw/.DS_Store
 prj.cw/.vscode/*
+prj.cw/out/*
+prj.cw/bin/*
+prj.cw/.vs/*
 .DS_Store
