@@ -7,6 +7,22 @@
 #include <algorithm>
 #include <vector>
 
+/*!
+  \defgroup clf_lib Библиотека для классификации контента.
+  @{
+*/
+
+/*!
+  \brief Содержит возможные метки для содержимого зоны.
+
+  text - обычный  текст документа. \n
+  small_text - текст меньшего размера, чем обычный (м. б. сноски, пометки). \n
+  large_text - текст большего размера, чем обычный (м. б. заголовки). \n
+  horizontal_line - горизонтальная линия. \n
+  vertical_line - вертикальная линия. \n
+  graphic - м.б. графики, схемы, таблицы. \n
+  picture - изображения (отличается от graphic плотностью пикселей).
+*/
 enum class Label {
   text,
   large_text, // titles, headings
@@ -85,3 +101,7 @@ class ClassifyRectangles {
     static std::vector<cv::Scalar> color_for_label;
     static std::string LabelToStr(Label lbl);
 };  
+
+/*!
+  @}
+*/
