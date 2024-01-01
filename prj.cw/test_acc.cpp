@@ -11,6 +11,17 @@
 #include "classify_blocks/classify_blocks.hpp"
 #include "pdf2img/pdf2img.h"
 
+/*!
+  \defgroup test_acc Модуль для вычисленяи процента правильных ответов.
+  @{
+*/
+
+/*!
+*   \param argc[1] json файл, содержащий правильные типы зон страниц, на которых считается точность, и номера этих страниц в курсовой.
+*   \param argc[2] путь до pdf файла.
+*   
+*   
+*/
 int main(int argv, char* argc[]) {
 
   poppler::document* mypdf = poppler::document::load_from_file(argc[2]);
@@ -31,7 +42,7 @@ int main(int argv, char* argc[]) {
 
   std::vector<cv::Mat> images;
 
-  for (int i_page = 0; i_page < images_from_pdf.get_size(); i_page += 1) {
+  for (int i_page = 0; i_page < images_from_pdf.get_size(); i_page += 1) { 
     images.push_back(images_from_pdf[i_page]);
   }
 
@@ -80,3 +91,7 @@ int main(int argv, char* argc[]) {
 
   return 0;
 }
+
+/*!
+  @}
+*/

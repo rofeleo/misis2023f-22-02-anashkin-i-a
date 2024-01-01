@@ -6,7 +6,7 @@
 #include <vector>
 
 /*!
-    \defgroup test_app Тестовое приложение.
+    \defgroup test_app Тестовый модуль.
     @{
 */
 
