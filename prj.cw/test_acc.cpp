@@ -62,15 +62,15 @@ int main(int argv, char* argc[]) {
     for (const auto& region : block["regions"]) {
 
       if (i_page > images.size()) {
-        std::cout << "page wrong: " << i_page;
-        return 0;
+        throw(std::out_of_range("i page is wrong"));
       } 
 
       if (i_rect > rect[i_page].size()) {
-        std::cout << "rect wrong: " << i_page << " " << i_rect;
-        cv::imshow("wrong page", images[i_page]);
-        cv::waitKey(0);
-        return 0;
+        throw(std::out_of_range("i rect is wrong"));
+        // std::cout << "rect wrong: " << i_page << " " << i_rect;
+        // cv::imshow("wrong page", images[i_page]);
+        // cv::waitKey(0);
+        // return 0;
       }
 
       Label y = static_cast<Label>(std::stoi(region["region_attributes"]["type"].get<std::string>()));
